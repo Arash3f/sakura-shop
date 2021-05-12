@@ -16,4 +16,8 @@ class users(models.Model):
     picture = models.ImageField("picture" , upload_to = "users_picture/" , null=True , blank=True)
 
 
-        
+class detail(models.Model):
+    login_img = models.ImageField("login" , upload_to = "login_img/" , null=True , blank=True)
+    register_img = models.ImageField("register" , upload_to = "register_img/" , null=True , blank=True)
+    re_password_img = models.ImageField("re password" , upload_to = "re_password_img/" , null=True , blank=True)
+    
