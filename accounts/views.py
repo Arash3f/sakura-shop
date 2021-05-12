@@ -13,8 +13,8 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
     serializer_class = user_register
     
     def post(self, request, *args, **kwargs):
-        username = request.POST['username']
-        email = request.POST['email']
+        username = request.data['username']
+        email = request.data['email']
         users = User.objects.all()
         new_json = {}
         if users.filter(username = username):
