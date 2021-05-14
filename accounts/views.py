@@ -28,6 +28,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
             new_json['user'] = True
             if users.filter(email = email):
                 new_json['email'] = False
+                return Response(new_json , status=status.HTTP_400_BAD_REQUEST)
             else:
                 return self.create(request, *args, **kwargs)
             
