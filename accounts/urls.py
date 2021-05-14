@@ -12,4 +12,6 @@ urlpatterns = [
 	path('v1/login_pic/' , views.login_pic ),
 	path('v1/register_pic/' , views.register_pic ),
 	path('v1/re_password_pic/' , views.re_password_pic ),
+	path('v1/auth/check_email/' , views.check_email_is_available , name="check_email_is_available"),
+
 ]
