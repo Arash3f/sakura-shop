@@ -12,5 +12,6 @@ urlpatterns = [
 	path('v1/login_pic/' , views.login_pic ),
 	path('v1/register_pic/' , views.register_pic ),
 	path('v1/re_password_pic/' , views.re_password_pic ),
+	path("v1/username/" , views.username )
 
 ]
