@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     'site_model.apps.SiteModelConfig',
     "product.apps.ProductConfig",
 
+    # doc 
+    'drf_yasg',
+
 ]
 
 MIDDLEWARE = [
@@ -106,8 +109,9 @@ DATABASES = {
 
 # derf config
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
@@ -147,6 +151,10 @@ USE_L10N = True
 USE_TZ = True
 
 
+
+# for show email in consol :
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
@@ -162,3 +170,12 @@ MEDIA_ROOT   = os.path.join(BASE_DIR , "media")
 
 # for heroku
 django_heroku.settings(locals())
+
+
+# Email config
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'alfshop3@gmail.com'
+EMAIL_HOST_PASSWORD = 'step1step'
+EMAIL_PORT = 587

@@ -1,5 +1,5 @@
-from .serializer import site_model_serializer
-from .models import Private_Site_Information
+from .serializer import site_model_serializer , about_we_serializer , contact_us_serializer
+from .models import Private_Site_Information ,About_we , Contact_Us
 from rest_framework import generics, mixins, status
 from rest_framework.response import Response
 
@@ -18,3 +18,23 @@ class site_information(generics.GenericAPIView , mixins.ListModelMixin):
             return Response({text},status=status.HTTP_406_NOT_ACCEPTABLE)
         else:
             return self.create(request, *args, **kwargs)
+
+class about_we(generics.GenericAPIView , mixins.ListModelMixin , mixins.CreateModelMixin):
+    serializer_class = about_we_serializer
+    queryset = About_we.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+class contact_us(generics.GenericAPIView , mixins.ListModelMixin , mixins.CreateModelMixin):
+    serializer_class = contact_us_serializer
+    queryset = Contact_Us.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
