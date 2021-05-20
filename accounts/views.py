@@ -16,6 +16,9 @@ from rest_framework.decorators import (api_view,
                                         permission_classes,
                                         )
 from django.urls import reverse
+
+from django.core.mail import EmailMultiAlternatives
+
 from django.core.mail import send_mail
 from django.utils.http import (urlsafe_base64_decode, 
                                 urlsafe_base64_encode,
@@ -55,7 +58,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
                 token = RefreshToken.for_user(user)
                 current_site = get_current_site(request).domain
                 relativeLink = reverse('email-confirm')
-                absurl = 'http://'+current_site+relativeLink+'?token='+str(token)
+                absurl = 'http://'+current_site+relativeLink
                 email_body ="""با سلام
                 متن پیام .....  """+"\n"+" نام شما :"+user.username+"\n"+"link : "+absurl
                 send_mail(subject="Sakura shop support" , message=email_body , from_email="alfshop3@gmail.com" ,recipient_list=[email] , fail_silently=False)
@@ -76,11 +79,17 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
             token = PasswordResetTokenGenerator().make_token(user)
             current_site = get_current_site(request).domain
             relativeLink = reverse('password-reset-confirm' , kwargs={"uidb64" : uidb64 , "token" : token})
-            absurl = 'http://'+current_site+relativeLink+'?token='+str(token)
+            absurl = 'http://'+current_site+relativeLink
             email_body ="""با سلام
             متن پیام .....  """+"\n"+" نام شما :"+user.username+"\n"+"link : "+absurl
 
-            send_mail(subject="Sakura shop support" , message=email_body , from_email="alfshop3@gmail.com" ,recipient_list=[email] , fail_silently=False)
+            html_content = '<p>This is an <strong>important</strong> message.</p>'
+            # msg = EmailMultiAlternatives(())
+            msg = EmailMultiAlternatives(subject="Sakura shop support" , body=email_body , from_email="alfshop3@gmail.com" ,to=[email] )
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            
+            # send_mail(subject="Sakura shop support" , message=email_body , from_email="alfshop3@gmail.com" ,recipient_list=[email] , fail_silently=False)
         
         return Response({"success" : "Email sent "} , status=status.HTTP_200_OK)
 
