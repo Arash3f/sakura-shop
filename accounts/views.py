@@ -83,13 +83,13 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
             email_body ="""با سلام
             متن پیام .....  """+"\n"+" نام شما :"+user.username+"\n"+"link : "+absurl
 
-            html_content = '<p>This is an <strong>important</strong> message.</p>'
+            # html_content = '<p>This is an <strong>important</strong> message.</p>'
             # msg = EmailMultiAlternatives(())
-            msg = EmailMultiAlternatives(subject="Sakura shop support" , body=email_body , from_email="alfshop3@gmail.com" ,to=[email] )
-            msg.attach_alternative(html_content, "text/html")
-            msg.send()
+            # msg = EmailMultiAlternatives(subject="Sakura shop support" , body=email_body , from_email="alfshop3@gmail.com" ,to=[email] )
+            # msg.attach_alternative(html_content, "text/html")
+            # msg.send()
             
-            # send_mail(subject="Sakura shop support" , message=email_body , from_email="alfshop3@gmail.com" ,recipient_list=[email] , fail_silently=False)
+            send_mail(subject="Sakura shop support" , message=email_body , from_email="alfshop3@gmail.com" ,recipient_list=[email] , fail_silently=False)
         
         return Response({"success" : "Email sent "} , status=status.HTTP_200_OK)
 
