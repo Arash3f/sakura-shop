@@ -59,7 +59,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
                 token = RefreshToken.for_user(user)
                 current_site = get_current_site(request).domain
                 relativeLink = reverse('email-confirm')
-                absurl = 'http://'+current_site+relativeLink+'?token='+str(token)
+                absurl = 'http://'+current_site+relativeLink+str(token)
                 email_body ="""با سلام
                 متن پیام .....  """+"\n"+" نام شما :"+user.username+"\n"+"link : "+absurl
                 send_mail(subject="Sakura shop support" , message=email_body , from_email="alfshop3@gmail.com" ,recipient_list=[email] , fail_silently=False)
