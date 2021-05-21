@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from .serializer import (user_register ,
                         RequestPasswordResetEmailSerializer , 
                         SetNewPasswordSerializer,
+                        Check_Confirm_Email_serializer,
                         )
 from django.contrib.auth.models import User
 from .models import detail
@@ -124,9 +125,10 @@ class SetNewPassword(generics.GenericAPIView):
 
 # confirm user email 
 class Check_Confirm_Email(generics.GenericAPIView):
+    serializer_class = Check_Confirm_Email_serializer
     def post(self, request):
+        serializer =  self.serializer_class(request.data)
         token = request.data['token']
-        # token = request.GET.get('token')
         try:
             pyload = jwt.decode(token,settings.SECRET_KEY)
             user = User.objects.get(id =pyload["user_id"] )

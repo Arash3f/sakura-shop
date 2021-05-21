@@ -32,6 +32,11 @@ class RequestPasswordResetEmailSerializer(serializers.Serializer):
     class Meta:
         fields = ['email']
 
+class Check_Confirm_Email_serializer(serializers.Serializer):
+    token = serializers.CharField(min_length = 1, write_only =True)
+    class Meta:
+        fields = ['token']
+
 class SetNewPasswordSerializer(serializers.Serializer):
     password = serializers.CharField(min_length = 6 , max_length = 68 , write_only =True)
     token = serializers.CharField(min_length = 1, write_only =True)
