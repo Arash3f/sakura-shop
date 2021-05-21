@@ -17,5 +17,11 @@ class product_sub_group(admin.ModelAdmin):
 @admin.register(models.product)
 class product(admin.ModelAdmin):
     field = "__all__"
-    list_display=[ 'name' , 'description_one' , 'p_cost' , 'group']
+    list_display=[ 'name'  , 'group']
+
+@admin.register(models.Price_to_weight)
+class Price_to_weight(admin.ModelAdmin):
+    field = "__all__"
+    list_display=[ 'product'  , 'size' , 'weight_type'  , 'p_cost']
+    list_filter = ['product',]
     
