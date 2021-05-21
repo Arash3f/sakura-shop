@@ -124,8 +124,9 @@ class SetNewPassword(generics.GenericAPIView):
 
 # confirm user email 
 class Check_Confirm_Email(generics.GenericAPIView):
-    def get(self, request):
-        token = request.GET.get('token')
+    def post(self, request):
+        token = request.data['token']
+        # token = request.GET.get('token')
         try:
             pyload = jwt.decode(token,settings.SECRET_KEY)
             user = User.objects.get(id =pyload["user_id"] )
