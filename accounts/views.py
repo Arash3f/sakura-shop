@@ -18,8 +18,13 @@ from rest_framework.decorators import (api_view,
                                         )
 from django.urls import reverse
 
+# email section ===
 from django.core.mail import EmailMultiAlternatives
-
+from datetime import datetime
+from email.mime.image import MIMEImage
+from django.template.loader import get_template
+import os
+# 
 from django.core.mail import send_mail
 from django.utils.http import (urlsafe_base64_decode, 
                                 urlsafe_base64_encode,
@@ -60,9 +65,28 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
                 current_site = get_current_site(request).domain
                 relativeLink = reverse('email-confirm')
                 absurl = 'http://'+current_site+relativeLink+str(token)
-                email_body ="""با سلام
-                متن پیام .....  """+"\n"+" نام شما :"+user.username+"\n"+"link : "+absurl
-                send_mail(subject="Sakura shop support" , message=email_body , from_email="alfshop3@gmail.com" ,recipient_list=[email] , fail_silently=False)
+
+                message = get_template("confirm_email.html").render({
+                                        'username': user.username ,
+                                        'absurl' : absurl,
+                                    })
+                mail = EmailMultiAlternatives(
+                                    "تایید ایمیل",
+                                    message,
+                                    from_email="alfshop3@gmail.com",
+                                    to=[email],
+                                )
+                mail.mixed_subtype = 'related'
+                mail.attach_alternative(message, "text/html")
+                image = "reset_email_Sakura.png"
+                file_path = os.path.join('static', image)
+                with open(file_path, mode='rb') as f:
+                    img = MIMEImage(f.read())
+                    img.add_header('Content-ID', '<{name}>'.format(name=image))
+                    img.add_header('Content-Disposition', 'inline', filename=image)
+                mail.attach(img)
+                mail.send()
+                
                 return Response({"success" : "Email sent "} , status=status.HTTP_200_OK)
 
 # first user request for give email  
@@ -81,17 +105,29 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
             current_site = get_current_site(request).domain
             relativeLink = reverse('password-reset-confirm' , kwargs={"uidb64" : uidb64 , "token" : token})
             absurl = 'http://'+current_site+relativeLink
-            email_body ="""با سلام
-            متن پیام .....  """+"\n"+" نام شما :"+user.username+"\n"+"link : "+absurl
 
-            # html_content = '<p>This is an <strong>important</strong> message.</p>'
-            # msg = EmailMultiAlternatives(())
-            # msg = EmailMultiAlternatives(subject="Sakura shop support" , body=email_body , from_email="alfshop3@gmail.com" ,to=[email] )
-            # msg.attach_alternative(html_content, "text/html")
-            # msg.send()
-            
-            send_mail(subject="Sakura shop support" , message=email_body , from_email="alfshop3@gmail.com" ,recipient_list=[email] , fail_silently=False)
-        
+            message = get_template("email_reset_password.html").render({
+                                    'username': user.username ,
+                                    'date' : datetime.now(),
+                                    'absurl' : absurl,
+                                })
+            mail = EmailMultiAlternatives(
+                                "درخواست تغییر رمز",
+                                message,
+                                from_email="alfshop3@gmail.com",
+                                to=[email],
+                            )
+            mail.mixed_subtype = 'related'
+            mail.attach_alternative(message, "text/html")
+            image = "reset_email_Sakura.png"
+            file_path = os.path.join('static', image)
+            with open(file_path, mode='rb') as f:
+                img = MIMEImage(f.read())
+                img.add_header('Content-ID', '<{name}>'.format(name=image))
+                img.add_header('Content-Disposition', 'inline', filename=image)
+            mail.attach(img)
+            mail.send()
+
         return Response({"success" : "Email sent "} , status=status.HTTP_200_OK)
 
 # check token for reset password
