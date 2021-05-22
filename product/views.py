@@ -1,7 +1,6 @@
-from .serializer import product_group_serializer , product_list_serializer
-from .models import product_group , product
+from .serializer import product_group_serializer , product_list_serializer , pack_list_serializer , product_serializer
+from .models import product_group , product , packs
 from rest_framework import status , generics , mixins
-
 
 # override PageNumberPagination for product list :
 from rest_framework.pagination import PageNumberPagination
@@ -47,5 +46,18 @@ class best_product_two(generics.GenericAPIView , mixins.ListModelMixin):
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+class pack_list(generics.GenericAPIView , mixins.ListModelMixin):
+    serializer_class = pack_list_serializer
+    queryset = packs.objects.all()
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+class product(generics.GenericAPIView , mixins.RetrieveModelMixin):
+    serializer_class = product_serializer
+    queryset = product.objects.all()
+    lookup_field = 'slug'
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
 
