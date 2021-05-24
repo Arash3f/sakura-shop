@@ -5,25 +5,16 @@ from django.core.validators import MaxValueValidator
 
 # site detail ...
 class product_group(models.Model):
-    name = models.CharField("متن" ,max_length = 100 , blank=True , null = True ,help_text = "متن نمایشی")    
+    name = models.CharField("متن" ,max_length = 100 , blank=True , null = True ,help_text = "متن نمایشی")  
+    group = models.ForeignKey('self' , verbose_name="سر گروه", on_delete=models.CASCADE , null=True , blank = True ,help_text = "درصورت داشتن سر گروه ، وارد شود ")
+  
     class Meta:
         verbose_name = ("دسته بندی")
         verbose_name_plural = ("دسته بندی ها")
     
     def __str__(self):
         return self.name
-
-class product_sub_group(models.Model):
-    name = models.CharField("متن" ,max_length = 100 , blank=True , null = True ,help_text = "متن نمایشی")
-    group = models.ForeignKey('product_group' ,related_name='sub_group', verbose_name="سر گروه", on_delete=models.CASCADE , null=True , blank = True ,help_text = "درصورت داشتن سر گروه ، وارد شود ")
     
-    class Meta:
-        verbose_name = ("زیر گروه")
-        verbose_name_plural = ("زیر گروه ها")
-    
-    def __str__(self):
-        return self.name
-
 class product(models.Model):
     name = models.CharField("نام کالا" ,max_length = 100 , blank=True , null = True)
     slug = models.SlugField(unique=True, allow_unicode=True, max_length=255)

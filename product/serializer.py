@@ -2,12 +2,10 @@ from .models import product_group , product ,packs , product_cost
 from rest_framework import serializers
 
 class product_group_serializer(serializers.ModelSerializer):
-    sub_group = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = product_group
-        fields = ('name' ,'sub_group')
-        depth = 1
+        fields = ('id','name' ,'group')
 
 class product_list_serializer(serializers.ModelSerializer):
     

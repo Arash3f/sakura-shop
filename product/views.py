@@ -10,7 +10,7 @@ class StandardResultsSetPagination(PageNumberPagination):
 # all group data
 class group_list(generics.GenericAPIView , mixins.ListModelMixin):
     serializer_class = product_group_serializer
-    queryset = product_group.objects.all()
+    queryset = product_group.objects.all().order_by("group")
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
