@@ -9,11 +9,6 @@ class product_group(admin.ModelAdmin):
     list_display=['name']
     # ordering = ['-top_group']
     
-@admin.register(models.product_sub_group)
-class product_sub_group(admin.ModelAdmin):
-    field = "__all__"
-    list_display=['name']
-    # ordering = ['-top_group']
 @admin.register(models.product)
 class product(admin.ModelAdmin):
     field = "__all__"
