@@ -1,5 +1,7 @@
-from .serializer import product_group_serializer , product_list_serializer , pack_list_serializer , product_serializer
-from .models import product_group , product , packs
+from .serializer import product_list_serializer , pack_list_serializer , product_serializer
+from .serializer import product_group_serializer 
+from .models import product , packs
+from .models import product_group
 from rest_framework import status , generics , mixins
 
 # override PageNumberPagination for product list :

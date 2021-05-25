@@ -7,12 +7,13 @@ from . import models
 class product_group(admin.ModelAdmin):
     field = "__all__"
     list_display=['name']
+
     # ordering = ['-top_group']
     
 @admin.register(models.product)
 class product(admin.ModelAdmin):
     field = "__all__"
-    list_display=[ 'name'  , 'group']
+    list_display=[ 'name'  ]
     prepopulated_fields = {'slug': ('name',), }
 
 @admin.register(models.product_cost)

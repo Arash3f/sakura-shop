@@ -23,7 +23,7 @@ class product(models.Model):
     available = models.BooleanField(verbose_name="(موجودی)وضعیت" , default=True  )
     sell = models.IntegerField(verbose_name='تعداد فروش' , blank=True , null = True )
     # relations :
-    group = models.ForeignKey('product_group' , verbose_name="گروه" , on_delete=models.CASCADE )
+    group = models.ForeignKey('product_group' , verbose_name="گروه" , on_delete=models.CASCADE , blank=True , null = True)
 
     class Meta:
         unique_together = ['slug', 'name']
