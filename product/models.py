@@ -23,7 +23,7 @@ class product(models.Model):
     available = models.BooleanField(verbose_name="(موجودی)وضعیت" , default=True  )
     sell = models.IntegerField(verbose_name='تعداد فروش' , blank=True , null = True )
     # relations :
-    group = models.ForeignKey('product_group' , verbose_name="گروه" , on_delete=models.CASCADE )
+    group = models.ForeignKey('product_group' , verbose_name="گروه" , blank=True , null = True, on_delete=models.CASCADE )
 
     class Meta:
         unique_together = ['slug', 'name']
@@ -46,8 +46,8 @@ class packs(models.Model):
     
 class product_cost(models.Model):
     # relations :
-    product = models.ForeignKey('product' ,related_name = "product_cost", verbose_name="کالا" , on_delete=models.CASCADE )
-    pack = models.ForeignKey('packs' ,related_name = "product_cost", verbose_name="بسته" , on_delete=models.CASCADE )
+    product = models.ForeignKey('product' ,related_name = "product_cost", verbose_name="کالا" , on_delete=models.CASCADE , blank=True , null = True)
+    pack = models.ForeignKey('packs' ,related_name = "product_cost", verbose_name="بسته" , on_delete=models.CASCADE , blank=True , null = True)
     discount = models.PositiveIntegerField(verbose_name='تخفیف' ,default = 0 ,validators=[MaxValueValidator(99)])
     available = models.BooleanField(verbose_name="(بسته)وضعیت" , default=True  )
     cost = models.IntegerField(verbose_name='قیمت' , blank=True , null = True )
