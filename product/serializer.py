@@ -12,8 +12,7 @@ class product_list_serializer(serializers.ModelSerializer):
     
     class Meta:
         model = product
-        fields = ('slug','name','product_cost','picture')
-        depth = 1
+        fields = ('id','slug','name','show_cost','available','picture')
 
 
 class pack_list_serializer(serializers.ModelSerializer):
@@ -26,6 +25,7 @@ class product_cost_serializer(serializers.ModelSerializer):
     class Meta:
         model = product_cost
         fields = ('pack' , 'cost' ,'discount' , 'available' )
+        depth = 1
 
 class product_serializer(serializers.ModelSerializer):
     product_cost = product_cost_serializer(many=True, read_only=True)

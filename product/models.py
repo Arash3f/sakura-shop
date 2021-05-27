@@ -22,6 +22,7 @@ class product(models.Model):
     inventory = models.PositiveIntegerField(verbose_name='موجودی',)
     available = models.BooleanField(verbose_name="(موجودی)وضعیت" , default=True  )
     sell = models.IntegerField(verbose_name='تعداد فروش' , blank=True , null = True )
+    show_cost = models.IntegerField(verbose_name='قیمت نمایشی' , blank=True , null = True , default= 0)
     # relations :
     group = models.ForeignKey('product_group' , verbose_name="گروه" , on_delete=models.CASCADE , blank=True , null = True)
 
