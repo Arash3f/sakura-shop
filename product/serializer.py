@@ -19,7 +19,7 @@ class pack_list_serializer(serializers.ModelSerializer):
     
     class Meta:
         model = packs
-        fields = ('title','weight')
+        fields = ('id','title','weight')
     
 class product_cost_serializer(serializers.ModelSerializer):
     class Meta:
