@@ -15,11 +15,12 @@ class product_list_serializer(serializers.ModelSerializer):
         fields = ('slug','name','product_cost','picture')
         depth = 1
 
+
 class pack_list_serializer(serializers.ModelSerializer):
     
     class Meta:
         model = packs
-        fields = ('id','title','weight')
+        fields = ('id','title','weight','parent')
     
 class product_cost_serializer(serializers.ModelSerializer):
     class Meta:

@@ -35,7 +35,8 @@ class product(models.Model):
 
 class packs(models.Model):
     title = models.CharField(verbose_name="عنوان" , max_length = 100 , blank=True , null = True )
-    weight = models.IntegerField(verbose_name='اندازه' )
+    weight = models.PositiveIntegerField(verbose_name='اندازه' , blank=True , null = True)
+    parent = models.ForeignKey('self' , verbose_name = "نوع" , on_delete=models.CASCADE , blank = True , null = True)
 
     class Meta:
         verbose_name = ("بسته ها")
