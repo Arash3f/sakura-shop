@@ -6,7 +6,7 @@ from django.core.validators import MaxValueValidator
 # site detail ...
 class product_group(models.Model):
     name = models.CharField("متن" ,max_length = 100 , blank=True , null = True ,help_text = "متن نمایشی")  
-    group = models.ForeignKey('self' , verbose_name="سر گروه", on_delete=models.CASCADE , null=True , blank = True ,help_text = "درصورت داشتن سر گروه ، وارد شود ")
+    group = models.ForeignKey('self' ,related_name = "sub_group" ,verbose_name="سر گروه", on_delete=models.CASCADE , null=True , blank = True ,help_text = "درصورت داشتن سر گروه ، وارد شود ")
   
     class Meta:
         verbose_name = ("دسته بندی")

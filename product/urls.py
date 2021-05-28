@@ -12,4 +12,5 @@ urlpatterns = [
     re_path(r'v1/product/(?P<slug>[-\w]+)/', views.product.as_view()),
     # groups :
     path('v1/group_list/', views.group_list.as_view()),
+    path('v1/group_list2/', views.group_list2.as_view()),
 ]

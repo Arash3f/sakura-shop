@@ -1,5 +1,8 @@
 from .serializer import product_list_serializer , pack_list_serializer , product_serializer
-from .serializer import product_group_serializer 
+from .serializer import (
+    product_group_serializer ,
+    product_group_serializer2,
+    )
 from .models import product , packs
 from .models import product_group
 from rest_framework import status , generics , mixins
@@ -16,6 +19,15 @@ class group_list(generics.GenericAPIView , mixins.ListModelMixin):
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+
+class group_list2(generics.GenericAPIView , mixins.ListModelMixin):
+    serializer_class = product_group_serializer2
+    queryset = product_group.objects.filter(group__isnull=True)
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
 
 # all product list
 class product_list(generics.GenericAPIView , mixins.ListModelMixin):
