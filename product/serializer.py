@@ -6,14 +6,14 @@ class product_group_serializer(serializers.ModelSerializer):
 
     class Meta:
         model = product_group
-        fields = ('id','name' ,'group')
+        fields = ('id','name' ,'group' , 'open')
 
 class product_group_serializer2(serializers.ModelSerializer):
     # sub = product_group_serializer2_helper(many=True, read_only=True)
     sub_group = serializers.StringRelatedField(many=True)
     class Meta:
         model = product_group
-        fields = ('name' ,'sub_group')
+        fields = ('id','name' ,'sub_group' ,'open')
 
 class product_list_serializer(serializers.ModelSerializer):
     
