@@ -43,6 +43,7 @@ urlpatterns = [
     path('site_model/' , include('site_model.urls')),
     path('product/' , include('product.urls')),
     path('auth_api/', include('rest_framework.urls')),
+    path('shop/', include('shop.urls')),
     # DOC
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

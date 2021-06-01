@@ -59,6 +59,9 @@ class product_cost(models.Model):
         verbose_name = ("قیمت")
         verbose_name_plural = ("قیمت ها")
 
+    def __str__(self):
+        return self.pack.title
+    
     def p_cost(self):
         return "{:,}".format(int(self.cost))
     p_cost.short_description = "قیمت"

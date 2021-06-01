@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'site_model.apps.SiteModelConfig',
     "product.apps.ProductConfig",
+    "shop.apps.ShopConfig",
 
     # doc 
     'drf_yasg',
