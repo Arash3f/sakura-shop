@@ -13,6 +13,8 @@ class users(models.Model):
     registration_date = models.DateField("registration date" , auto_now_add=True)
     picture = models.ImageField("picture" , upload_to = "users_picture/" , null=True , blank=True)
 
+    # def __str__(self):
+    #     return self.user__username
 
 class detail(models.Model):
     login_img = models.ImageField("login" , upload_to = "login_img/" , null=True , blank=True)

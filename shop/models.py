@@ -8,6 +8,7 @@ class OrderRow(models.Model):
 	order =models.ForeignKey("Order",  on_delete=models.CASCADE,related_name='rows')
 	amount = models.IntegerField()
 	pack = models.ForeignKey(product_cost , on_delete=models.PROTECT)
+	price = models.IntegerField(default=0)
 
 class Order(models.Model):
 	# Status values. DO NOT EDIT
@@ -24,3 +25,6 @@ class Order(models.Model):
 	order_time = models.DateTimeField(null=True)
 	status = models.IntegerField(choices=choi)
 	total_price = models.IntegerField(default=0)
+
+	def __str__(self):
+		return self.user.user.get_username()
