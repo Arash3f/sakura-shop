@@ -116,8 +116,8 @@ def Cancel_Order_Row(request):
     return Response({"order deleted"} , status=status.HTTP_200_OK)
     
     
-    {
-        "product":"1",
-        "pack":"3",
-        "amount":"-20"
-    }
+    # {
+    #     "product":"1",
+    #     "pack":"3",
+    #     "amount":"-20"
+    # }
