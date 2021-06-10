@@ -70,6 +70,7 @@ def modify_Order(request):
             order_row.delete()
         else : 
             order_row.amount-=int(amount[1:])
+            order_row.price -=int(amount[1:])*cost
             order.total_price-=int(amount[1:])*cost
             order_row.save()
             order.save()
@@ -79,18 +80,44 @@ def modify_Order(request):
             return Response({"error"} , status=status.HTTP_200_OK)
         else : 
             order_row.amount+=int(amount[1:])
+            order_row.price +=int(amount[1:])*cost
             order.total_price+=int(amount[1:])*cost
             order_row.save()
             order.save()
     
     
     return Response({"ok"} , status=status.HTTP_200_OK)
+
+
+@api_view(('GET',))
+@permission_classes([IsAuthenticated]) 
+def Cancel_Order(request):
+    user = request.user
+    order = Order.objects.get(user_id = user.id , status=1)
+    order.delete()
+    return Response({"order deleted"} , status=status.HTTP_200_OK)
+
+@api_view(('POST',))
+@permission_classes([IsAuthenticated]) 
+def Cancel_Order_Row(request):
+    user = request.user
+    order = Order.objects.get(user_id = user.id , status=1)
+    pproduct_id = request.data["product"]
+    pproduct = product.objects.get(id = pproduct_id )
+    pack = request.data["pack"]
+    cost = product_cost.objects.get(product_id = pproduct.id , pack_id = pack).cost
+    order_row =OrderRow.objects.filter(order = order , product_id = pproduct.id)[0]
+    order.total_price-=int(order_row.amount)*cost
+    if order.total_price == 0 :
+        order.delete()
+    else:
+        order.save()
+    order_row.delete()
+    return Response({"order deleted"} , status=status.HTTP_200_OK)
     
     
-    
-    
-    # {
-    #     "product":"1",
-    #     "pack":"3",
-    #     "amount":"-50"
-    # }
+    {
+        "product":"1",
+        "pack":"3",
+        "amount":"-20"
+    }
