@@ -44,7 +44,7 @@ class Order_Row_serializer(serializers.ModelSerializer):
                     pack = pack,
                     )
 
-                if old_row[0]:
+                if old_row.count() == 1:
 
                     if product.inventory < amount+old_row[0].amount :
                         raise APIException("There was a problem!")
