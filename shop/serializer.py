@@ -2,7 +2,7 @@ from rest_framework import serializers , status
 from accounts.models import users
 from rest_framework.response import Response
 from shop.models import OrderRow , Order
-from product.models import product_cost
+from product.models import product_cost , product
 
 from rest_framework.exceptions import APIException
 class Order_Row_serializer(serializers.ModelSerializer):
@@ -76,16 +76,25 @@ class Order_Row_serializer(serializers.ModelSerializer):
         model = OrderRow
         fields = ('product' , 'amount' , 'pack')
         
-    
+
+class Order_serializer_helper_product(serializers.ModelSerializer):
+    class Meta:
+        model = product
+        fields =('id' , "name" ,"slug" ,  "picture" , "available")
+class Order_serializer_helper_pack(serializers.ModelSerializer):
+    class Meta:
+        model = product_cost
+        fields =('id' , "discount" ,"available" ,  "cost" )
 class Order_serializer_helper(serializers.ModelSerializer):
+    product = Order_serializer_helper_product()
+    pack = Order_serializer_helper_pack()
     class Meta:
         model = OrderRow
-        fields = "__all__"
-        depth = 1
+        fields =("amount" ,"price" ,  "product" , "pack")
 class Order_serializer(serializers.ModelSerializer):
     rows = Order_serializer_helper(many=True)
 
     class Meta:
         model = Order
-        fields = ('id','order_time' , 'status' , 'total_price' , 'rows')
+        fields = ('total_price' , 'rows')
         

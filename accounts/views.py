@@ -45,6 +45,7 @@ from rest_framework.exceptions import ValidationError
 from coreapi.compat import force_text
 
 from rest_framework.exceptions import APIException
+from shop.models import Order
 class CustomValidation(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = 'Bad request'
@@ -208,7 +209,11 @@ class Check_Confirm_Email(generics.GenericAPIView):
             if not user.is_active:
                 user.is_active = True
                 user.save()
-                users.objects.create(user = user )
+                user2 = users.objects.create(user = user )
+                Order.objects.create(
+                    user = user2 ,
+                    status = 1 ,
+                )
 
             return Response({"email":"email activated"} , status = status.HTTP_200_OK)
 
