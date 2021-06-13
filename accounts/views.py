@@ -1,19 +1,22 @@
 from django.http import request
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from .serializer import (user_register ,
+from accounts.serializer import (
+                        User_Register_Serialiaer ,
                         RequestPasswordResetEmailSerializer , 
                         SetNewPasswordSerializer,
                         Check_Confirm_Email_serializer,
                         )
 from django.contrib.auth.models import User
-from .models import detail
-from rest_framework import (generics,
+from accounts.models import detail
+from rest_framework import (
+                            generics,
                             mixins ,
                             status,
                             )
 from rest_framework.response import Response
-from rest_framework.decorators import (api_view, 
+from rest_framework.decorators import (
+                                        api_view, 
                                         permission_classes,
                                         )
 from django.urls import reverse
@@ -26,7 +29,8 @@ from django.template.loader import get_template
 import os
 # 
 from django.core.mail import send_mail
-from django.utils.http import (urlsafe_base64_decode, 
+from django.utils.http import (
+                                urlsafe_base64_decode, 
                                 urlsafe_base64_encode,
                                 )
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -37,17 +41,38 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from onshop import settings
 import jwt
 from django.contrib.sites.shortcuts import get_current_site
+from rest_framework.exceptions import ValidationError
+from coreapi.compat import force_text
+
+from rest_framework.exceptions import APIException
+class CustomValidation(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = 'Bad request'
+
+    def __init__(self, detail, field, status_code):
+        if status_code is not None:self.status_code = status_code
+        if detail is not None:
+            self.detail = {field: force_text(detail)}
+        else: self.detail = {'detail': force_text(self.default_detail)}
+
 
 class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
-    serializer_class = user_register
+    serializer_class = User_Register_Serialiaer
     
     def post(self, request, *args, **kwargs):
-        username = request.data['username']
-        email = request.data['email']
+        try:
+            username = request.data['username']
+            email = request.data['email']
+        except KeyError as e :
+            raise CustomValidation('Incomplete information','error', status_code=status.HTTP_400_BAD_REQUEST)
+        
         users = User.objects.all()
         new_json = {}
+
+        # check available user with this username
         if users.filter(username = username):
             new_json['user'] = False
+            # check available user with this email
             if users.filter(email = email):
                 new_json['email'] = False
             else:
@@ -55,10 +80,12 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
             return Response(new_json , status=status.HTTP_200_OK)
         else:
             new_json['user'] = True
+            # check available user with this email
             if users.filter(email = email):
                 new_json['email'] = False
                 return Response(new_json , status=status.HTTP_200_OK)
             else:
+                # create user
                 self.create(request, *args, **kwargs)
                 user = User.objects.get(email=email)
                 token = RefreshToken.for_user(user)
@@ -77,6 +104,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
                                     to=[email],
                                 )
                 mail.mixed_subtype = 'related'
+                # add img to email :
                 mail.attach_alternative(message, "text/html")
                 image = "reset_email_Sakura.png"
                 file_path = os.path.join('static', image)
@@ -85,8 +113,8 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
                     img.add_header('Content-ID', '<{name}>'.format(name=image))
                     img.add_header('Content-Disposition', 'inline', filename=image)
                 mail.attach(img)
+
                 mail.send()
-                
                 return Response({"success" : "Email sent "} , status=status.HTTP_200_OK)
 
 # first user request for give email  
@@ -96,14 +124,19 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
     def post(self , request):
 
         serializer = self.serializer_class(request.data)
-        email = request.data['email']
+        try:
+            email = request.data['email']
+        except KeyError as e :
+            raise CustomValidation('Incomplete information','error', status_code=status.HTTP_400_BAD_REQUEST)
 
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
+
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
             token = PasswordResetTokenGenerator().make_token(user)
+
             current_site = get_current_site(request).domain
-            relativeLink = reverse('password-reset-confirm' , kwargs={"uidb64" : uidb64 , "token" : token})
+            relativeLink = reverse('check_reset_token' , kwargs={"uidb64" : uidb64 , "token" : token})
             absurl = 'http://'+current_site+relativeLink
 
             message = get_template("email_reset_password.html").render({
@@ -118,6 +151,7 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
                                 to=[email],
                             )
             mail.mixed_subtype = 'related'
+            # img for email :
             mail.attach_alternative(message, "text/html")
             image = "reset_email_Sakura.png"
             file_path = os.path.join('static', image)
@@ -126,6 +160,7 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
                 img.add_header('Content-ID', '<{name}>'.format(name=image))
                 img.add_header('Content-Disposition', 'inline', filename=image)
             mail.attach(img)
+
             mail.send()
 
         return Response({"success" : "Email sent "} , status=status.HTTP_200_OK)
@@ -138,7 +173,8 @@ class PasswordTokenCheck(generics.GenericAPIView):
             id = smart_str(urlsafe_base64_decode(uidb64 ))
             user = User.objects.get(id =id )
             if not PasswordResetTokenGenerator().check_token(user , token):
-                return Response({"error":"token not vaid"} , status = status.HTTP_200_OK)
+                raise CustomValidation('token not vaid','error', status_code=status.HTTP_200_OK)
+
             return Response({  
                 "success":True , 
                 "message":"valid",
@@ -164,8 +200,8 @@ class Check_Confirm_Email(generics.GenericAPIView):
     serializer_class = Check_Confirm_Email_serializer
     def post(self, request):
         serializer =  self.serializer_class(request.data)
-        token = request.data['token']
         try:
+            token = request.data['token']
             pyload = jwt.decode(token,settings.SECRET_KEY)
             user = User.objects.get(id =pyload["user_id"] )
 
@@ -173,27 +209,35 @@ class Check_Confirm_Email(generics.GenericAPIView):
                 user.is_active = True
                 user.save()
             return Response({"email":"email activated"} , status = status.HTTP_200_OK)
+
+        except KeyError as e :
+            raise CustomValidation('Incomplete information','error', status_code=status.HTTP_400_BAD_REQUEST)
         except jwt.ExpiredSignature as identifier:
-            return Response({"error":"activate expired"} , status = status.HTTP_200_OK)
+            raise CustomValidation('activate expired','error', status_code=status.HTTP_200_OK)
         except jwt.exceptions.DecodeError as identifier:
-            return Response({"error":"token not vaid"} , status = status.HTTP_200_OK)
+            raise CustomValidation('token not vaid','error', status_code=status.HTTP_200_OK)
+
 
 @api_view(('GET',))
 def login_pic(request):
-    img = detail.objects.get(pk=1).login_img
+    img = detail.objects.all()[0].login_img
     return Response({"url":img.url} , status=status.HTTP_200_OK)
 
 @api_view(('GET',))
 def register_pic(request):
-    img = detail.objects.get(pk=1).register_img
+    img = detail.objects.all()[0].register_img
     return Response({"url":img.url} , status=status.HTTP_200_OK)
 
 @api_view(('GET',))
 def re_password_pic(request):
-    img = detail.objects.get(pk=1).re_password_img
+    img = detail.objects.all()[0].re_password_img
     return Response({"url":img.url} , status=status.HTTP_200_OK)
 
 @api_view(('GET',))
 @permission_classes([IsAuthenticated])
 def username(request):
-    return Response({"username":request.user.username} , status=status.HTTP_200_OK) 
+    user = request.user
+    if user.first_name:
+        return Response({"username":request.user.first_name} , status=status.HTTP_200_OK) 
+    else:
+        return Response({"username":request.user.username} , status=status.HTTP_200_OK) 
