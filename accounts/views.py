@@ -8,7 +8,7 @@ from accounts.serializer import (
                         Check_Confirm_Email_serializer,
                         )
 from django.contrib.auth.models import User
-from accounts.models import detail
+from accounts.models import detail , users
 from rest_framework import (
                             generics,
                             mixins ,
@@ -90,7 +90,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
                 user = User.objects.get(email=email)
                 token = RefreshToken.for_user(user)
                 current_site = get_current_site(request).domain
-                relativeLink = reverse('email-confirm')
+                relativeLink = reverse('email_confirm')
                 absurl = 'http://'+current_site+relativeLink+str(token)
 
                 message = get_template("confirm_email.html").render({
@@ -208,6 +208,8 @@ class Check_Confirm_Email(generics.GenericAPIView):
             if not user.is_active:
                 user.is_active = True
                 user.save()
+                users.objects.create(user = user )
+
             return Response({"email":"email activated"} , status = status.HTTP_200_OK)
 
         except KeyError as e :

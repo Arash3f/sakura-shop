@@ -6,6 +6,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import smart_bytes
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.hashers import make_password
+from accounts.models import users
 
 class TestViews_Register(APITestCase):
 
@@ -63,6 +64,7 @@ class TestViews_Confirm_Email(APITestCase):
     def test_check_email_ok(self):
         response = self.client.post(self.url,self.data,format='json')
         user = User.objects.get(username = self.user.username)
+        user2 = users.objects.get(user=user)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(user.is_active  , True)
 
