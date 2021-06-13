@@ -1,5 +1,5 @@
 from django.contrib import admin
-from . import models
+from accounts import models
 # Register your models here.
 
 @admin.register(models.detail)
@@ -9,3 +9,4 @@ class detail(admin.ModelAdmin):
 @admin.register(models.users)
 class users(admin.ModelAdmin):
     field = "__all__"
+    list_display = ['__str__' ,'email', 'money' , 'registration_date']

@@ -6,7 +6,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_str
 from rest_framework.exceptions import AuthenticationFailed 
 
-class user_register(serializers.ModelSerializer):
+class User_Register_Serialiaer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     def create(self, validated_data):
@@ -14,7 +14,7 @@ class user_register(serializers.ModelSerializer):
         username = validated_data['username']
         password = validated_data['password']
         email = validated_data['email']
-        
+
         user = User.objects.create_user(
             username=username,
             password=password,
@@ -22,7 +22,9 @@ class user_register(serializers.ModelSerializer):
             is_active=False,
             is_staff=True,
         )
+
         return user
+
     class Meta:
         model = User
         fields = ("username", "password", "email")
