@@ -88,6 +88,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
             else:
                 # create user
                 self.create(request, *args, **kwargs)
+# SEND EMAIL ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 user = User.objects.get(email=email)
                 token = RefreshToken.for_user(user)
                 current_site = get_current_site(request).domain
@@ -114,7 +115,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
                     img.add_header('Content-ID', '<{name}>'.format(name=image))
                     img.add_header('Content-Disposition', 'inline', filename=image)
                 mail.attach(img)
-
+# END ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 mail.send()
                 return Response({"success" : "Email sent "} , status=status.HTTP_200_OK)
 
@@ -132,7 +133,7 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
 
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
-
+# SEND EMAIL ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
             token = PasswordResetTokenGenerator().make_token(user)
 
@@ -161,31 +162,30 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
                 img.add_header('Content-ID', '<{name}>'.format(name=image))
                 img.add_header('Content-Disposition', 'inline', filename=image)
             mail.attach(img)
-
+# END ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             mail.send()
 
         return Response({"success" : "Email sent "} , status=status.HTTP_200_OK)
 
 # check token for reset password
-class PasswordTokenCheck(generics.GenericAPIView):
-    def get(self, request, uidb64, token):
+@api_view(('GET',))
+def PasswordTokenCheck(request, uidb64, token):
+    try:
+        id = smart_str(urlsafe_base64_decode(uidb64 ))
+        user = User.objects.get(id =id )
+        if not PasswordResetTokenGenerator().check_token(user , token):
+            raise CustomValidation('token not vaid','error', status_code=status.HTTP_200_OK)
 
-        try:
-            id = smart_str(urlsafe_base64_decode(uidb64 ))
-            user = User.objects.get(id =id )
-            if not PasswordResetTokenGenerator().check_token(user , token):
-                raise CustomValidation('token not vaid','error', status_code=status.HTTP_200_OK)
+        return Response({  
+            "success":True , 
+            "message":"valid",
+            "uidb64" : uidb64 , 
+            "token" : token
+        } , status = status.HTTP_200_OK)
 
-            return Response({  
-                "success":True , 
-                "message":"valid",
-                "uidb64" : uidb64 , 
-                "token" : token
-            } , status = status.HTTP_200_OK)
-
-        except DjangoUnicodeDecodeError:
-            if not PasswordResetTokenGenerator().check_token(user):
-                return Response({"error":"token not vaid"} , status = status.HTTP_200_OK)
+    except DjangoUnicodeDecodeError:
+        if not PasswordResetTokenGenerator().check_token(user):
+            return Response({"error":"token not vaid"} , status = status.HTTP_200_OK)
 
 # change password
 class SetNewPassword(generics.GenericAPIView):
