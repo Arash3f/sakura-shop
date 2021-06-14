@@ -10,6 +10,29 @@ class OrderRow(models.Model):
 	pack = models.ForeignKey(product_cost , on_delete=models.PROTECT)
 	price = models.IntegerField(default=0)
 
+	class Meta:
+		verbose_name = ('ردیف')
+		verbose_name_plural=('ردیف ها')
+
+	def Order_row_user(self):
+		return self.order.user.user.username
+
+	def Increase_amount(self , amount ):
+		self.amount += amount
+		self.save()
+	
+	def Increase_price(self , amount ,cost):
+		self.price += cost*amount
+		self.save()
+
+	def Decrease_amount(self , amount ):
+		self.amount -= amount
+		self.save()
+	
+	def Decrease_price(self , amount ,cost):
+		self.price -= cost*amount
+		self.save()
+
 class Order(models.Model):
 	# Status values. DO NOT EDIT
 	STATUS_SHOPPING = 1
@@ -26,5 +49,20 @@ class Order(models.Model):
 	status = models.IntegerField(choices=choi)
 	total_price = models.IntegerField(default=0)
 
+	class Meta:
+		verbose_name = ('سبد')
+		verbose_name_plural=('سبد ها')
+
+	def Order_user(self):
+		return self.user.user.username
+
 	def __str__(self):
 		return self.user.user.get_username()
+	
+	def Increase_total_price(self , cost ,  amount ):
+		self.total_price += cost*amount
+		self.save()
+
+	def Decrease_total_price(self , cost ,  amount ):
+		self.total_price -= cost*amount
+		self.save()

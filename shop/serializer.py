@@ -3,8 +3,8 @@ from accounts.models import users
 from rest_framework.response import Response
 from shop.models import OrderRow , Order
 from product.models import product_cost , product
+from accounts.views import CustomValidation
 
-from rest_framework.exceptions import APIException
 class Order_Row_serializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
@@ -15,53 +15,30 @@ class Order_Row_serializer(serializers.ModelSerializer):
         pack = validated_data['pack']
 
         if pack.product == product :
-            if Order.objects.filter(user = user , status= 1).count() == 0 :
-                order = Order.objects.create(
-                    user = user ,
-                    status = 1 ,
-                    total_price=pack.cost*amount,
-                )
-
-                if product.inventory < amount :
-                    raise APIException("There was a problem!")
-
-                new_order_row = OrderRow.objects.create(
-                    product = product,
-                    order = order ,
-                    amount = amount,
-                    pack = pack,
-                    price = pack.cost*amount,
-                )
-                return new_order_row
-            elif Order.objects.filter(user = user, status= 1).count() == 1 :
+            if Order.objects.filter(user = user, status= 1).count() == 1 :
                 order = Order.objects.get(
                     user = user ,
                 )
-
                 old_row = OrderRow.objects.filter(
                     product = product,
                     order = order,
                     pack = pack,
                     )
-
                 if old_row.count() == 1:
 
                     if product.inventory < amount+old_row[0].amount :
-                        raise APIException("There was a problem!")
-
-                    order.total_price+=pack.cost*amount
-                    order.save()
+                        raise CustomValidation('Product inventory is not enough ','inventory', status_code=status.HTTP_400_BAD_REQUEST)
+                    order.Increase_total_price(pack.cost,amount)
                     row = old_row[0]
-                    row.amount +=amount
-                    row.price += pack.cost*amount
-                    row.save()
+                    row.Increase_amount(amount)
+                    row.Increase_price(pack.cost , amount)
                     return row
+
                 else:
                 
                     if product.inventory < amount :
-                        raise APIException("There was a problem!")
-                    order.total_price+=pack.cost*amount
-                    order.save()
+                        raise CustomValidation('Product inventory is not enough ','inventory', status_code=status.HTTP_400_BAD_REQUEST)
+                    order.Increase_total_price(pack.cost,amount)
                     new_order_row = OrderRow.objects.create(
                         product = product,
                         order = order ,
@@ -70,8 +47,12 @@ class Order_Row_serializer(serializers.ModelSerializer):
                         price = pack.cost*amount,
                     )
                     return new_order_row
+
             else:
-                pass 
+                raise CustomValidation('User shoud have one Order','Order', status_code=status.HTTP_400_BAD_REQUEST)
+        else : 
+            raise CustomValidation('pack not match to product','Invalid data', status_code=status.HTTP_400_BAD_REQUEST)
+    
     class Meta:
         model = OrderRow
         fields = ('product' , 'amount' , 'pack')
@@ -88,6 +69,7 @@ class Order_serializer_helper_pack(serializers.ModelSerializer):
 class Order_serializer_helper(serializers.ModelSerializer):
     product = Order_serializer_helper_product()
     pack = Order_serializer_helper_pack()
+    
     class Meta:
         model = OrderRow
         fields =("amount" ,"price" ,  "product" , "pack")
