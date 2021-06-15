@@ -1,4 +1,4 @@
-from .models import Private_Site_Information , About_we , Contact_Us
+from .models import Private_Site_Information , About_Us , Contact_Us
 from rest_framework import serializers
 
 class site_model_serializer(serializers.ModelSerializer):
@@ -10,7 +10,7 @@ class site_model_serializer(serializers.ModelSerializer):
 class about_we_serializer(serializers.ModelSerializer):
     
     class Meta:
-        model = About_we
+        model = About_Us
         fields = '__all__'
 
 class contact_us_serializer(serializers.ModelSerializer):

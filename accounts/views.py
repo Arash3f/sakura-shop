@@ -45,7 +45,7 @@ from rest_framework.exceptions import ValidationError
 from coreapi.compat import force_text
 
 from rest_framework.exceptions import APIException
-from shop.models import Order
+from shop.models import Order, OrderRow
 class CustomValidation(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = 'Bad request'
@@ -244,7 +244,8 @@ def re_password_pic(request):
 @permission_classes([IsAuthenticated])
 def username(request):
     user = request.user
+    rows = OrderRow.objects.filter(order__user__user = user).count()
     if user.first_name:
-        return Response({"username":request.user.first_name} , status=status.HTTP_200_OK) 
+        return Response({"username":user.first_name,"order rows":rows} , status=status.HTTP_200_OK) 
     else:
-        return Response({"username":request.user.username} , status=status.HTTP_200_OK) 
+        return Response({"username":user.username,"order rows":rows} , status=status.HTTP_200_OK) 

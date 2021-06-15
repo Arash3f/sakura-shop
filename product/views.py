@@ -13,6 +13,18 @@ from rest_framework.pagination import PageNumberPagination
 from product.serializer import product_similar_list_serializer
 class StandardResultsSetPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
+class search(generics.GenericAPIView , mixins.ListModelMixin):
+    serializer_class = product_list_serializer
+    queryset = product.objects.all()
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        query_name = self.kwargs.get('name')
+        return self.queryset.filter(name__contains=query_name)
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+        
 
 # all group data
 class group_list(generics.GenericAPIView , mixins.ListModelMixin):

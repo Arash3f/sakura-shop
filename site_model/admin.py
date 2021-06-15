@@ -6,10 +6,10 @@ from . import models
 @admin.register(models.Private_Site_Information)
 class Private_Site_Information(admin.ModelAdmin):
     field = "__all__"
-    list_display=[ 'name' , 'title']
+    list_display=[ 'name' ]
 
-@admin.register(models.About_we)
-class About_we(admin.ModelAdmin):
+@admin.register(models.About_Us)
+class About_Us(admin.ModelAdmin):
     field = "__all__"
     list_display=[ 'title' , 'sub_title']
 

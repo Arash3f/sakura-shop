@@ -158,7 +158,7 @@ class TestViews_catch_username(APITestCase):
         self.client.login(username="string",password="string")
         response = self.client.get(self.url_1)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, {'username': 'string'})
+        self.assertEqual(response.data, {'username': 'string', 'order rows': 0})
 
     def test_catch_username_by_first_name(self):
         self.client.login(username="string",password="string")
@@ -167,6 +167,6 @@ class TestViews_catch_username(APITestCase):
         user.save()
         response = self.client.get(self.url_1)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, {'username': 'arash'})
+        self.assertEqual(response.data, {'username': 'arash', 'order rows': 0})
 
         

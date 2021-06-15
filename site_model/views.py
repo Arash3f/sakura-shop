@@ -1,5 +1,5 @@
 from .serializer import site_model_serializer , about_we_serializer , contact_us_serializer
-from .models import Private_Site_Information ,About_we , Contact_Us
+from .models import Private_Site_Information ,About_Us , Contact_Us
 from rest_framework import generics, mixins, status
 from rest_framework.response import Response
 
@@ -19,9 +19,9 @@ class site_information(generics.GenericAPIView , mixins.ListModelMixin):
         else:
             return self.create(request, *args, **kwargs)
 
-class about_we(generics.GenericAPIView , mixins.ListModelMixin , mixins.CreateModelMixin):
+class About_Us(generics.GenericAPIView , mixins.ListModelMixin , mixins.CreateModelMixin):
     serializer_class = about_we_serializer
-    queryset = About_we.objects.all()
+    queryset = About_Us.objects.all()
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
