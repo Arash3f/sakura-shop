@@ -1,5 +1,5 @@
-from .serializer import site_model_serializer , about_we_serializer , contact_us_serializer
-from .models import Private_Site_Information ,About_Us , Contact_Us
+from site_model.serializer import site_model_serializer , about_we_serializer , contact_us_serializer
+from site_model.models import Private_Site_Information ,About_Us , Contact_Us
 from rest_framework import generics, mixins, status
 from rest_framework.response import Response
 

@@ -1,7 +1,12 @@
-from .models import product ,packs , product_cost , ProductGallery
-from .models import product_group 
+from product.models import (
+    product ,
+    packs ,
+    product_cost , 
+    ProductGallery ,
+    product_group,
+    Properties,
+)
 from rest_framework import serializers
-from product.models import Properties
 
 class product_group_serializer(serializers.ModelSerializer):
 
@@ -49,12 +54,11 @@ class product_serializer_helper_properties(serializers.ModelSerializer):
 
 class product_serializer(serializers.ModelSerializer):
     product_cost = product_cost_serializer(many=True, read_only=True)
-    product_properties = product_serializer_helper_properties( read_only=True)
     picture = product_serializer_helper_picture(many=True )
 
     class Meta:
         model = product
-        fields = ('id','name','inventory','available','product_properties','product_cost','picture' )
+        fields = ('id','name','inventory','available','product_cost','picture' ,'description')
 
 class product_similar_list_serializer(serializers.ModelSerializer):
     picture = product_serializer_helper_picture(many=True )

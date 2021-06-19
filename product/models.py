@@ -35,6 +35,9 @@ class Properties(models.Model):
         verbose_name = ("خاصیت ها")
         verbose_name_plural = ("خواص")
 
+    def __str__(self):
+        return self.product
+
 class ProductGallery(models.Model):
     picture = models.ImageField("عکس" ,upload_to = 'product/', blank=True , null = True)
     product = models.ForeignKey('Product', related_name="picture", blank=True, null=True , on_delete=models.CASCADE)
@@ -42,10 +45,11 @@ class ProductGallery(models.Model):
     class Meta:
         verbose_name = ("عکس ")
         verbose_name_plural = ("عکس ها")
-  
+
 class product(models.Model):
     name = models.CharField("نام کالا" ,max_length = 100 , blank=True , null = True)
     slug = models.SlugField(unique=True, allow_unicode=True, max_length=255)
+    description = models.TextField(verbose_name="توضیحات" , blank=True , null = True)
     inventory = models.PositiveIntegerField(verbose_name='موجودی',)
     available = models.BooleanField(verbose_name="(موجودی)وضعیت" , default=True  )
     sell = models.IntegerField(verbose_name='تعداد فروش' , blank=True , null = True )

@@ -49,6 +49,13 @@ INSTALLED_APPS = [
     'site_model.apps.SiteModelConfig',
     "product.apps.ProductConfig",
     "shop.apps.ShopConfig",
+    "zarinpal.apps.ZarinpalConfig",
+
+    # clear :
+    'django_cleanup.apps.CleanupConfig',
+
+    # zarinpal :
+    'zeep',
 
     # doc 
     'drf_yasg',
