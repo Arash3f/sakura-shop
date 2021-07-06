@@ -14,6 +14,7 @@ from rest_framework.decorators import (api_view,
 from shop.serializer import Order_Row_serializer , Order_serializer
 from shop.models import OrderRow , Order
 from accounts.views import CustomValidation
+from accounts.models import users
 
 class Add_Order_Row(generics.GenericAPIView , mixins.CreateModelMixin ):
     serializer_class = Order_Row_serializer
@@ -29,6 +30,7 @@ class Show_Order(generics.GenericAPIView  , mixins.ListModelMixin):
     
     def get_queryset(self):
         user = self.request.user
+        user = users.objects.get(user=user)
         order = Order.objects.filter(user_id = user.id , status = 1)
         return order
     
@@ -42,6 +44,7 @@ class Show_all_Order(generics.GenericAPIView  , mixins.ListModelMixin):
     
     def get_queryset(self):
         user = self.request.user
+        user = users.objects.get(user=user)
         order = Order.objects.filter(user_id = user.id )
         return order
     

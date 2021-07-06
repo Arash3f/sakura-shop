@@ -44,7 +44,7 @@ class Order(models.Model):
 			( STATUS_CANCELED   , "لغوشده"  ),
 			(  STATUS_SENT   , "ارسال‌شده"  )
 			)
-	user = models.ForeignKey(users , on_delete=models.PROTECT)
+	user = models.ForeignKey(users , on_delete=models.CASCADE)
 	order_time = models.DateTimeField(null=True)
 	status = models.IntegerField(choices=choi)
 	total_price = models.IntegerField(default=0)

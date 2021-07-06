@@ -2,7 +2,7 @@ from rest_framework import serializers , status
 from accounts.models import users
 from rest_framework.response import Response
 from shop.models import OrderRow , Order
-from product.models import product_cost , product
+from product.models import ProductGallery, product, product_cost
 from accounts.views import CustomValidation
 
 class Order_Row_serializer(serializers.ModelSerializer):
@@ -57,8 +57,14 @@ class Order_Row_serializer(serializers.ModelSerializer):
         model = OrderRow
         fields = ('product' , 'amount' , 'pack')
         
+class Order_serializer_helper_picture(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProductGallery
+        fields =('picture',)
 
 class Order_serializer_helper_product(serializers.ModelSerializer):
+    picture = Order_serializer_helper_picture(many=True )
     class Meta:
         model = product
         fields =('id' , "name" ,"slug" ,  "picture" , "available")

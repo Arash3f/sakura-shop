@@ -1,52 +1,59 @@
+import os
+import jwt
+from onshop import settings
+from coreapi.compat import force_text
+from datetime import datetime
+from email.mime.image import MIMEImage
+
+# django :
 from django.http import request
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from accounts.serializer import (
-                        User_Register_Serialiaer ,
-                        RequestPasswordResetEmailSerializer , 
-                        SetNewPasswordSerializer,
-                        Check_Confirm_Email_serializer,
-                        )
 from django.contrib.auth.models import User
-from accounts.models import detail , users
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import (
+                                urlsafe_base64_decode, 
+                                urlsafe_base64_encode,
+                                )
+from django.utils.encoding import (
+                                DjangoUnicodeDecodeError, 
+                                smart_bytes,
+                                smart_str,
+                                )
+
+# rest :
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.exceptions import APIException
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import (
                             generics,
                             mixins ,
                             status,
                             )
-from rest_framework.response import Response
 from rest_framework.decorators import (
                                         api_view, 
                                         permission_classes,
                                         )
-from django.urls import reverse
 
-# email section ===
-from django.core.mail import EmailMultiAlternatives
-from datetime import datetime
-from email.mime.image import MIMEImage
-from django.template.loader import get_template
-import os
-# 
-from django.core.mail import send_mail
-from django.utils.http import (
-                                urlsafe_base64_decode, 
-                                urlsafe_base64_encode,
-                                )
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import (DjangoUnicodeDecodeError, 
-                                    smart_bytes, smart_str,
-                                    )
-from rest_framework_simplejwt.tokens import RefreshToken
-from onshop import settings
-import jwt
-from django.contrib.sites.shortcuts import get_current_site
-from rest_framework.exceptions import ValidationError
-from coreapi.compat import force_text
-
-from rest_framework.exceptions import APIException
+# model : 
 from shop.models import Order, OrderRow
+from accounts.models import (
+                            image_section ,
+                            users,
+                            )
 
+# serializer : 
+from accounts.serializer import (
+                        User_Register_Serialiaer ,
+                        Request_Password_Reset_Email_Serializer , 
+                        Set_New_Password_Serializer,
+                        Check_Confirm_Email_serializer,
+                        )
+
+# custom validation :
 class CustomValidation(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = 'Bad request'
@@ -57,7 +64,7 @@ class CustomValidation(APIException):
             self.detail = {field: force_text(detail)}
         else: self.detail = {'detail': force_text(self.default_detail)}
 
-
+# user register section :
 class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
     serializer_class = User_Register_Serialiaer
     
@@ -68,7 +75,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
         except KeyError as e :
             raise CustomValidation('Incomplete information','error', status_code=status.HTTP_400_BAD_REQUEST)
         
-        users = User.objects.all()
+        all_user = User.objects.all()
         new_json = {}
 
         # check available user with this username
@@ -87,7 +94,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
                 new_json['email'] = False
                 return Response(new_json , status=status.HTTP_200_OK)
             else:
-                # create user
+                # create user :
                 self.create(request, *args, **kwargs)
 # SEND EMAIL ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 user = User.objects.get(email=email)
@@ -121,8 +128,8 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
                 return Response({"success" : "Email sent "} , status=status.HTTP_200_OK)
 
 # first user request for give email  
-class RequestPasswordResetEmail(generics.GenericAPIView):
-    serializer_class = RequestPasswordResetEmailSerializer
+class Request_Password_Reset_Email(generics.GenericAPIView):
+    serializer_class = Request_Password_Reset_Email_Serializer
 
     def post(self , request):
 
@@ -133,17 +140,16 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
             raise CustomValidation('Incomplete information','error', status_code=status.HTTP_400_BAD_REQUEST)
 
         if User.objects.filter(email=email).exists():
-            user = User.objects.get(email=email)
+            request_user = User.objects.get(email=email)
 # SEND EMAIL ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
-            token = PasswordResetTokenGenerator().make_token(user)
-
+            uidb64 = urlsafe_base64_encode(smart_bytes(request_user.id))
+            token = PasswordResetTokenGenerator().make_token(request_user)
             current_site = get_current_site(request).domain
             relativeLink = reverse('check_reset_token' , kwargs={"uidb64" : uidb64 , "token" : token})
             absurl = 'http://'+current_site+relativeLink
 
             message = get_template("email_reset_password.html").render({
-                                    'username': user.username ,
+                                    'username': request_user.username ,
                                     'date' : datetime.now(),
                                     'absurl' : absurl,
                                 })
@@ -168,11 +174,11 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
 
         return Response({"success" : "Email sent "} , status=status.HTTP_200_OK)
 
-# check token for reset password
+# just check token for reset password :
 @api_view(('GET',))
-def PasswordTokenCheck(request, uidb64, token):
+def Password_Token_Check(request, uidb64, token):
     try:
-        id = smart_str(urlsafe_base64_decode(uidb64 ))
+        id = smart_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(id =id )
         if not PasswordResetTokenGenerator().check_token(user , token):
             raise CustomValidation('token not vaid','error', status_code=status.HTTP_200_OK)
@@ -186,20 +192,21 @@ def PasswordTokenCheck(request, uidb64, token):
 
     except DjangoUnicodeDecodeError:
         if not PasswordResetTokenGenerator().check_token(user):
-            return Response({"error":"token not vaid"} , status = status.HTTP_200_OK)
+            return Response({"error":"Unicode decoding error"} , status = status.HTTP_200_OK)
 
 # change password
-class SetNewPassword(generics.GenericAPIView):
-    serializer_class = SetNewPasswordSerializer
+class Set_New_Password(generics.GenericAPIView):
+    serializer_class = Set_New_Password_Serializer
 
     def patch(self, request, *args, **kwargs):
         serializer = self.serializer_class(data= request.data)
         serializer.is_valid(raise_exception=True)
-        return Response({"ok":"Password changed "} , status = status.HTTP_200_OK)
+        return Response({"success":"Password changed "} , status = status.HTTP_200_OK)
 
-# confirm user email 
+# confirm users email :
 class Check_Confirm_Email(generics.GenericAPIView):
     serializer_class = Check_Confirm_Email_serializer
+
     def post(self, request):
         serializer =  self.serializer_class(request.data)
         try:
@@ -216,34 +223,33 @@ class Check_Confirm_Email(generics.GenericAPIView):
                     status = 1 ,
                 )
 
-            return Response({"email":"email activated"} , status = status.HTTP_200_OK)
+            return Response({"success":"email activated"} , status = status.HTTP_200_OK)
 
-        except KeyError as e :
-            raise CustomValidation('Incomplete information','error', status_code=status.HTTP_400_BAD_REQUEST)
         except jwt.ExpiredSignature as identifier:
             raise CustomValidation('activate expired','error', status_code=status.HTTP_200_OK)
         except jwt.exceptions.DecodeError as identifier:
             raise CustomValidation('token not vaid','error', status_code=status.HTTP_200_OK)
-
+        except KeyError as e :
+            raise CustomValidation('Incomplete information','error', status_code=status.HTTP_400_BAD_REQUEST)
 
 @api_view(('GET',))
 def login_pic(request):
-    img = detail.objects.all()[0].login_img
+    img = image_section.objects.all()[0].login_img
     return Response({"url":img.url} , status=status.HTTP_200_OK)
 
 @api_view(('GET',))
 def register_pic(request):
-    img = detail.objects.all()[0].register_img
+    img = image_section.objects.all()[0].register_img
     return Response({"url":img.url} , status=status.HTTP_200_OK)
 
 @api_view(('GET',))
 def re_password_pic(request):
-    img = detail.objects.all()[0].re_password_img
+    img = image_section.objects.all()[0].re_password_img
     return Response({"url":img.url} , status=status.HTTP_200_OK)
 
 @api_view(('GET',))
 @permission_classes([IsAuthenticated])
-def username(request):
+def get_user_username(request):
     user = request.user
     rows = OrderRow.objects.filter(order__user__user = user).count()
     if user.first_name:

@@ -26,9 +26,9 @@ class users(models.Model):
     def email(self):
         return self.user.email
 
-class detail(models.Model):
-    login_img = models.ImageField("login" , upload_to = "login_img/" , null=True , blank=True ,help_text = "عکس برای صفحه لاگین ")
-    register_img = models.ImageField("register" , upload_to = "register_img/" , null=True , blank=True ,help_text = "عکس برای صفحه ثبت نام ")
+class image_section(models.Model):
+    login_img       = models.ImageField("login"       , upload_to = "login_img/" , null=True , blank=True ,help_text = "عکس برای صفحه لاگین ")
+    register_img    = models.ImageField("register"    , upload_to = "register_img/" , null=True , blank=True ,help_text = "عکس برای صفحه ثبت نام ")
     re_password_img = models.ImageField("re password" , upload_to = "re_password_img/" , null=True , blank=True ,help_text = "عکس برای صفحه فراموشی رمز ")
     
     def __str__(self):

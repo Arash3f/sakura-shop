@@ -2,8 +2,8 @@ from django.contrib import admin
 from accounts import models
 # Register your models here.
 
-@admin.register(models.detail)
-class detail(admin.ModelAdmin):
+@admin.register(models.image_section)
+class image_section(admin.ModelAdmin):
     field = "__all__"
 
 @admin.register(models.users)

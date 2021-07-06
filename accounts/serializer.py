@@ -1,10 +1,11 @@
-from rest_framework import serializers , status
-from django.contrib.auth.models import User
-from rest_framework.response import Response
-from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import force_str
+from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed 
+from rest_framework.response import Response
+
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
 
 class User_Register_Serialiaer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -29,7 +30,7 @@ class User_Register_Serialiaer(serializers.ModelSerializer):
         model = User
         fields = ("username", "password", "email")
     
-class RequestPasswordResetEmailSerializer(serializers.Serializer):
+class Request_Password_Reset_Email_Serializer(serializers.Serializer):
     email = serializers.EmailField(min_length = 2)
     class Meta:
         fields = ['email']
@@ -39,12 +40,14 @@ class Check_Confirm_Email_serializer(serializers.Serializer):
     class Meta:
         fields = ['token']
 
-class SetNewPasswordSerializer(serializers.Serializer):
+class Set_New_Password_Serializer(serializers.Serializer):
     password = serializers.CharField(min_length = 6 , max_length = 68 , write_only =True)
     token = serializers.CharField(min_length = 1, write_only =True)
     uidb64 = serializers.CharField(min_length = 1, write_only =True)
+
     class Meta:
         fields = ['password', 'token' ,'uidb64']
+
     def validate(self, attrs):
         try:
             password = attrs.get('password')
@@ -53,12 +56,12 @@ class SetNewPasswordSerializer(serializers.Serializer):
             id = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(id =id)
             if not PasswordResetTokenGenerator().check_token(user , token):
-                raise AuthenticationFailed("token not valid" , 401 )
+                raise AuthenticationFailed("token not valid 1" , 401 )
             user.set_password(password)
             user.save()
             return user
 
         except Exception as e :
-            raise AuthenticationFailed("token not valid" , 401)
+            raise AuthenticationFailed("token not valid 2" , 401)
 
         return super().validate(attrs)
