@@ -8,9 +8,9 @@ from email.mime.image import MIMEImage
 # django :
 from django.http import request
 from django.contrib.auth.models import User
-from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
 from django.template.loader import get_template
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import (
@@ -68,6 +68,7 @@ class CustomValidation(APIException):
 class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
     serializer_class = User_Register_Serialiaer
     
+    
     def post(self, request, *args, **kwargs):
         try:
             username = request.data['username']
@@ -79,10 +80,10 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
         new_json = {}
 
         # check available user with this username
-        if users.filter(username = username):
+        if all_user.filter(username = username):
             new_json['user'] = False
             # check available user with this email
-            if users.filter(email = email):
+            if all_user.filter(email = email):
                 new_json['email'] = False
             else:
                 new_json['email'] = True
@@ -90,7 +91,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
         else:
             new_json['user'] = True
             # check available user with this email
-            if users.filter(email = email):
+            if all_user.filter(email = email):
                 new_json['email'] = False
                 return Response(new_json , status=status.HTTP_200_OK)
             else:
@@ -99,7 +100,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
 # SEND EMAIL ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 user = User.objects.get(email=email)
                 token = RefreshToken.for_user(user)
-                current_site = get_current_site(request).domain
+                current_site = settings.SITE_URL
                 relativeLink = reverse('email_confirm')
                 absurl = 'http://'+current_site+relativeLink+str(token)
 
@@ -110,7 +111,7 @@ class register_user(generics.GenericAPIView , mixins.CreateModelMixin):
                 mail = EmailMultiAlternatives(
                                     "تایید ایمیل",
                                     message,
-                                    from_email="alfshop3@gmail.com",
+                                    from_email=settings.EMAIL_HOST_USER ,
                                     to=[email],
                                 )
                 mail.mixed_subtype = 'related'
@@ -144,7 +145,7 @@ class Request_Password_Reset_Email(generics.GenericAPIView):
 # SEND EMAIL ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             uidb64 = urlsafe_base64_encode(smart_bytes(request_user.id))
             token = PasswordResetTokenGenerator().make_token(request_user)
-            current_site = get_current_site(request).domain
+            current_site = settings.SITE_URL
             relativeLink = reverse('check_reset_token' , kwargs={"uidb64" : uidb64 , "token" : token})
             absurl = 'http://'+current_site+relativeLink
 
@@ -156,7 +157,7 @@ class Request_Password_Reset_Email(generics.GenericAPIView):
             mail = EmailMultiAlternatives(
                                 "درخواست تغییر رمز",
                                 message,
-                                from_email="alfshop3@gmail.com",
+                                from_email=settings.EMAIL_HOST_USER,
                                 to=[email],
                             )
             mail.mixed_subtype = 'related'
@@ -234,17 +235,26 @@ class Check_Confirm_Email(generics.GenericAPIView):
 
 @api_view(('GET',))
 def login_pic(request):
-    img = image_section.objects.all()[0].login_img
+    try:
+        img = image_section.objects.all()[0].login_img
+    except:
+        raise CustomValidation('Not Found IMG','error', status_code=status.HTTP_404_NOT_FOUND)
     return Response({"url":img.url} , status=status.HTTP_200_OK)
 
 @api_view(('GET',))
 def register_pic(request):
-    img = image_section.objects.all()[0].register_img
+    try:
+        img = image_section.objects.all()[0].register_img
+    except:
+        raise CustomValidation('Not Found IMG','error', status_code=status.HTTP_404_NOT_FOUND)
     return Response({"url":img.url} , status=status.HTTP_200_OK)
 
 @api_view(('GET',))
 def re_password_pic(request):
-    img = image_section.objects.all()[0].re_password_img
+    try:
+        img = image_section.objects.all()[0].re_password_img
+    except:
+        raise CustomValidation('Not Found IMG','error', status_code=status.HTTP_404_NOT_FOUND)
     return Response({"url":img.url} , status=status.HTTP_200_OK)
 
 @api_view(('GET',))
