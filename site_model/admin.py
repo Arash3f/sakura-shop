@@ -17,4 +17,5 @@ class About_Us(admin.ModelAdmin):
 class Contact_Us(admin.ModelAdmin):
     field = "__all__"
     list_display=[ 'get_title_display' , 'name' , 'email' , 'phone']
+    list_filter = ('title' , )
     

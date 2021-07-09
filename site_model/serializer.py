@@ -1,4 +1,7 @@
-from site_model.models import Private_Site_Information , About_Us , Contact_Us
+from site_model.models import (Private_Site_Information ,
+                                About_Us ,
+                                Contact_Us
+                                )
 from rest_framework import serializers
 
 class site_model_serializer(serializers.ModelSerializer):

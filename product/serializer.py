@@ -1,28 +1,13 @@
 from product.models import (
     product ,
-    packs ,
-    product_cost , 
+    Packs ,
+    Product_Cost , 
     ProductGallery ,
     product_group,
-    Properties,
 )
 from rest_framework import serializers
 
-class product_group_serializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = product_group
-        fields = ('id','name' ,'group' , 'open' , 'picture')
-
-class product_group_serializer2(serializers.ModelSerializer):
-    # sub = product_group_serializer2_helper(many=True, read_only=True)
-    sub_group = serializers.StringRelatedField(many=True)
-    class Meta:
-        model = product_group
-        fields = ('id','name' ,'sub_group' ,'open')
-
 class product_serializer_helper_picture(serializers.ModelSerializer):
-
     class Meta:
         model = ProductGallery
         fields =('picture',)
@@ -31,43 +16,36 @@ class product_list_serializer(serializers.ModelSerializer):
     picture = product_serializer_helper_picture(many=True )
     class Meta:
         model = product
-        fields = ('id','slug','name','show_cost','available','picture')
+        fields = ('slug','name','show_cost','available','picture')
 
+# ************************************************************************
+
+class product_serializer_helper_cost(serializers.ModelSerializer):
+    class Meta:
+        model = Product_Cost
+        fields = ('pack' , 'cost' ,'discount' , 'available' )
+        depth = 1
+
+class product_serializer(serializers.ModelSerializer):
+    Product_Cost = product_serializer_helper_cost(many=True, read_only=True)
+    picture = product_serializer_helper_picture(many=True )
+
+    class Meta:
+        model = product
+        fields = ('name','inventory','available','Product_Cost','picture' ,'description')
+
+# ************************************************************************
 
 class pack_list_serializer(serializers.ModelSerializer):
     
     class Meta:
-        model = packs
+        model = Packs
         fields = ('id','title','weight','parent')
-    
-class product_cost_serializer(serializers.ModelSerializer):
-    class Meta:
-        model = product_cost
-        fields = ('id','pack' , 'cost' ,'discount' , 'available' )
-        depth = 1
 
-class product_serializer_helper_properties(serializers.ModelSerializer):
+# ************************************************************************
+
+class product_group_serializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Properties
-        fields = ("one"   ,"two"   ,"three" ,"four"  ,"five"  ,"six"   ,"seven" ,"eight" ,"nine"  ,"ten" )
-
-class product_serializer(serializers.ModelSerializer):
-    product_cost = product_cost_serializer(many=True, read_only=True)
-    picture = product_serializer_helper_picture(many=True )
-
-    class Meta:
-        model = product
-        fields = ('id','name','inventory','available','product_cost','picture' ,'description')
-
-class product_similar_list_serializer(serializers.ModelSerializer):
-    picture = product_serializer_helper_picture(many=True )
-
-    class Meta:
-        model = product
-        fields = ('slug','name','show_cost','available','picture')
-    
-        
-
-    
-
+        model = product_group
+        fields = ('id','name' ,'group' , 'open' , 'picture')

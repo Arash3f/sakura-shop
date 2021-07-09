@@ -30,6 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+SITE_URL="sdriedf.ir"
 
 # Application definition
 
@@ -218,3 +219,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'alfshop3@gmail.com'
 EMAIL_HOST_PASSWORD = 'step1step'
 EMAIL_PORT = 587
+
+
+LOGIN_URL = 'rest_framework:login'
+LOGOUT_URL = 'rest_framework:logout'

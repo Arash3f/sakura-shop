@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed 
+from rest_framework.exceptions import AuthenticationFailed , NotAcceptable
 from rest_framework.response import Response
 
 from django.contrib.auth.models import User
@@ -14,15 +14,18 @@ class User_Register_Serialiaer(serializers.ModelSerializer):
 
         username = validated_data['username']
         password = validated_data['password']
-        email = validated_data['email']
+        email    = validated_data['email']
 
-        user = User.objects.create_user(
-            username=username,
-            password=password,
-            email=email,
-            is_active=False,
-            is_staff=True,
-        )
+        try : 
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+                is_active=False,
+                is_staff=True,
+            )
+        except:
+            raise NotAcceptable("Cant create User "  , code= 406)
 
         return user
 
@@ -56,12 +59,12 @@ class Set_New_Password_Serializer(serializers.Serializer):
             id = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(id =id)
             if not PasswordResetTokenGenerator().check_token(user , token):
-                raise AuthenticationFailed("token not valid 1" , 401 )
+                raise AuthenticationFailed("token not valid for this user !" , 401 )
             user.set_password(password)
             user.save()
             return user
 
         except Exception as e :
-            raise AuthenticationFailed("token not valid 2" , 401)
+            raise AuthenticationFailed("token not valid " , 401)
 
         return super().validate(attrs)

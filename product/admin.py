@@ -1,36 +1,40 @@
 from django.contrib import admin
-from . import models
-
-@admin.register(models.product_group)
-class product_group(admin.ModelAdmin):
-    field = "__all__"
-    list_display=['name' , 'group']
-    
+from product import models
+   
 @admin.register(models.product)
 class product(admin.ModelAdmin):
     field = "__all__"
     list_display=[ 'name' ,"inventory","sell","group","available" ]
     prepopulated_fields = {'slug': ('name',), }
-
-@admin.register(models.product_cost)
-class product_cost(admin.ModelAdmin):
-    field = "__all__"
-    list_display=[ 'product' ,"pack","discount",'available' , 'cost']
-    
-@admin.register(models.packs)
-class producpackst_group(admin.ModelAdmin):
-    field = "__all__"
-    list_display=[ 'title' ,"weight","parent"]
-
-@admin.register(models.Properties)
-class Properties(admin.ModelAdmin):
-    field = "__all__"
+    list_filter = ('group' , 'available')
 
 @admin.register(models.ProductGallery)
 class ProductGallery(admin.ModelAdmin):
     field = "__all__"
     list_display=[ 'product' ,"picture"]
     list_filter = ("product",)
+
+@admin.register(models.Packs)
+class Packs(admin.ModelAdmin):
+    field = "__all__"
+    list_display=[ 'title' ,"weight","parent"]
+    list_filter = ("parent",)
+
+@admin.register(models.Product_Cost)
+class Product_Cost(admin.ModelAdmin):
+    field = "__all__"
+    list_display=[ 'product' ,"pack","discount",'available' , 'cost']
+    list_filter = ("product",)
+
+@admin.register(models.product_group)
+class product_group(admin.ModelAdmin):
+    field = "__all__"
+    list_display=['name' , 'group']
+    list_filter = ("group",)
+
+
+
+# test:
 
 # comment :
 # @admin.register(models.comment)

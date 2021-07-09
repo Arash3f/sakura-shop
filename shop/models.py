@@ -1,13 +1,12 @@
 from django.db import models
 from accounts.models import users
-from product.models import product , product_cost
-# Create your models here.
+from product.models import product , Product_Cost
 
 class OrderRow(models.Model):
 	product = models.ForeignKey(product , on_delete=models.CASCADE)
 	order =models.ForeignKey("Order",  on_delete=models.CASCADE,related_name='rows')
+	product_cost = models.ForeignKey(Product_Cost , on_delete=models.PROTECT)
 	amount = models.IntegerField()
-	pack = models.ForeignKey(product_cost , on_delete=models.PROTECT)
 	price = models.IntegerField(default=0)
 
 	class Meta:
