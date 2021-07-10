@@ -7,6 +7,9 @@ from product.serializer import (
 from product import models
 from rest_framework import generics , mixins
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+# for decode url slug :
+from urllib.parse import unquote
 
 # Pagination :
 # override PageNumberPagination for product list :
@@ -50,6 +53,16 @@ class product_page(generics.GenericAPIView , mixins.RetrieveModelMixin):
     queryset = models.product.objects.all()
     lookup_field = 'slug'
 
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        new_lookup = self.kwargs[lookup_url_kwarg]
+        new_lookup = unquote(new_lookup)
+        filter_kwargs = {self.lookup_field: new_lookup}
+        obj = get_object_or_404(queryset, **filter_kwargs)
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
@@ -60,6 +73,7 @@ class similar_product(generics.GenericAPIView , mixins.ListModelMixin):
 
     def get_queryset(self):
         slug = self.kwargs.get('slug')
+        slug = unquote(slug)
         pd = models.product.objects.get(slug=slug)
         gp = pd.group.group
         return self.queryset.filter(~Q(slug = slug),group__group=gp).order_by("-sell")[0:9]
@@ -75,6 +89,7 @@ class product_search(generics.GenericAPIView , mixins.ListModelMixin):
 
     def get_queryset(self):
         query_name = self.kwargs.get('slug')
+        query_name = unquote(query_name)
         return self.queryset.filter(slug__contains=query_name)
 
     def get(self, request, *args, **kwargs):
