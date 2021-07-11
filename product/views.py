@@ -1,7 +1,6 @@
 from product.serializer import (
     product_group_serializer ,
     product_list_serializer,
-    pack_list_serializer,
     product_serializer,
     )
 from product import models
@@ -58,6 +57,7 @@ class product_page(generics.GenericAPIView , mixins.RetrieveModelMixin):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
         new_lookup = self.kwargs[lookup_url_kwarg]
         new_lookup = unquote(new_lookup)
+        new_lookup = unquote(new_lookup)
         filter_kwargs = {self.lookup_field: new_lookup}
         obj = get_object_or_404(queryset, **filter_kwargs)
         self.check_object_permissions(self.request, obj)
@@ -73,6 +73,7 @@ class similar_product(generics.GenericAPIView , mixins.ListModelMixin):
 
     def get_queryset(self):
         slug = self.kwargs.get('slug')
+        slug = unquote(slug)
         slug = unquote(slug)
         pd = models.product.objects.get(slug=slug)
         gp = pd.group.group
@@ -90,15 +91,8 @@ class product_search(generics.GenericAPIView , mixins.ListModelMixin):
     def get_queryset(self):
         query_name = self.kwargs.get('slug')
         query_name = unquote(query_name)
+        query_name = unquote(query_name)
         return self.queryset.filter(slug__contains=query_name)
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-# pack : 
-class pack_list(generics.GenericAPIView , mixins.ListModelMixin):
-    serializer_class = pack_list_serializer
-    queryset = models.Packs.objects.all()
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)

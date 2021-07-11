@@ -77,7 +77,7 @@ class Order_serializer_helper_product(serializers.ModelSerializer):
     picture = Order_serializer_helper_picture(many=True )
     class Meta:
         model = product
-        fields =("name" ,"slug" , "picture" , "available")
+        fields =("id","name" ,"slug" , "picture" , "available")
 
 class Order_serializer_helper_pack(serializers.ModelSerializer):
     class Meta:
@@ -96,7 +96,7 @@ class Order_serializer_helper_rows(serializers.ModelSerializer):
     
     class Meta:
         model = OrderRow
-        fields =('id',"amount" ,"price" ,  "product" , "product_cost")
+        fields =("amount" ,"price" ,  "product" , "product_cost")
 
 class Order_serializer(serializers.ModelSerializer):
     rows = Order_serializer_helper_rows(many=True)

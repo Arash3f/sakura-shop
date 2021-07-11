@@ -12,9 +12,6 @@ urlpatterns = [
     re_path(r'api/v1/similar_product/(?P<slug>([^/]+))/', views.similar_product.as_view(), name="similar_product"),
 	re_path(r'api/v1/search/(?P<slug>([^/]+))/' , views.product_search.as_view() , name = "search_product"),
     
-    # pack :
-    path('api/v1/pack_list/', views.pack_list.as_view()),
-    
     # groups :
     path('api/v1/group_list/', views.group_list.as_view()),
 ]

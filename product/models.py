@@ -66,8 +66,6 @@ class product_group(models.Model):
     name = models.CharField("متن" ,max_length = 100 , blank=True , null = True ,help_text = "متن نمایشی")  
     group = models.ForeignKey('self' ,related_name = "sub_group" ,verbose_name="سر گروه", on_delete=models.CASCADE , null=True , blank = True ,help_text = "درصورت داشتن سر گروه ، وارد شود ")
     picture = models.ImageField("عکس" ,upload_to = 'product_group/', blank=True , null = True)
-    # for front : 
-    open = models.BooleanField(default=False )
 
     class Meta:
         verbose_name = ("دسته بندی")

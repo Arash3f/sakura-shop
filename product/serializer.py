@@ -27,20 +27,13 @@ class product_serializer_helper_cost(serializers.ModelSerializer):
         depth = 1
 
 class product_serializer(serializers.ModelSerializer):
-    Product_Cost = product_serializer_helper_cost(many=True, read_only=True)
+    product_cost = product_serializer_helper_cost(many=True)
     picture = product_serializer_helper_picture(many=True )
 
     class Meta:
         model = product
-        fields = ('name','inventory','available','Product_Cost','picture' ,'description')
-
-# ************************************************************************
-
-class pack_list_serializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Packs
-        fields = ('id','title','weight','parent')
+        fields = ('id','name','inventory','available','product_cost','picture' ,'description')
+        
 
 # ************************************************************************
 
@@ -48,4 +41,4 @@ class product_group_serializer(serializers.ModelSerializer):
 
     class Meta:
         model = product_group
-        fields = ('id','name' ,'group' , 'open' , 'picture')
+        fields = ('id','name' ,'group'  , 'picture')
