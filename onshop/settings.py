@@ -35,6 +35,8 @@ SITE_URL="sdriedf.ir"
 # Application definition
 
 INSTALLED_APPS = [
+    # admin :
+    # 'simpleui',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,6 +53,8 @@ INSTALLED_APPS = [
     "product.apps.ProductConfig",
     "shop.apps.ShopConfig",
     "zarinpal.apps.ZarinpalConfig",
+    'accounting',
+    'panel',
 
     # clear :
     'django_cleanup.apps.CleanupConfig',

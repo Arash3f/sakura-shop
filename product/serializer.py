@@ -23,7 +23,7 @@ class product_list_serializer(serializers.ModelSerializer):
 class product_serializer_helper_cost(serializers.ModelSerializer):
     class Meta:
         model = Product_Cost
-        fields = ('pack' , 'cost' ,'discount' , 'available' )
+        fields = ('id','pack' , 'cost' ,'discount' , 'available' )
         depth = 1
 
 class product_serializer(serializers.ModelSerializer):
